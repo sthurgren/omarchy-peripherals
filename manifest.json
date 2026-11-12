@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "sthurgren.peripherals",
+  "name": "Peripherals",
+  "version": "1.0.0",
+  "author": "sthurgren",
+  "license": "MIT",
+  "description": "Battery levels of wireless mice and keyboards via UPower.",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "Peripherals",
+    "description": "Battery levels of wireless mice and keyboards.",
+    "category": "System",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}

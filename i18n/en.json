@@ -1,0 +1,13 @@
+{
+  "title": "Peripherals",
+  "noDevices": "No devices",
+  "deviceCount": { "one": "%1 device", "other": "%1 devices" },
+  "oneLow": "%1 battery low",
+  "manyLow": { "one": "%1 device low", "other": "%1 devices low" },
+  "level.charging": "Charging",
+  "level.full": "Full",
+  "level.high": "High",
+  "level.good": "Good",
+  "level.low": "Low",
+  "level.critical": "Critical"
+}

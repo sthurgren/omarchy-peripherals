@@ -1,0 +1,56 @@
+#!/bin/bash
+# Send Omarchy notifications when a wireless peripheral (mouse, keyboard, ...)
+# reports a low battery through UPower.
+#
+# Logitech HID++ devices only report coarse levels (UPower marks their
+# percentage as "should be ignored"), so this follows UPower's warning-level.
+# Each device is notified once per level and reset once it is charged again.
+
+set -uo pipefail
+
+declare -A notified
+
+rank() {
+  case $1 in
+    low) echo 1 ;;
+    critical) echo 2 ;;
+    action) echo 3 ;;
+    *) echo 0 ;;
+  esac
+}
+
+field() {
+  awk -F': +' -v key="$1" '$1 ~ "^ *" key "$" { print $2; exit }'
+}
+
+check() {
+  local path info model serial level key
+  for path in $(upower -e); do
+    [[ $path == */DisplayDevice ]] && continue
+    info=$(upower -i "$path") || continue
+    [[ $(field "power supply" <<<"$info") == no ]] || continue
+
+    model=$(field model <<<"$info")
+    serial=$(field serial <<<"$info")
+    level=$(field warning-level <<<"$info")
+    key=${serial:-$model}
+
+    if (($(rank "$level") == 0)); then
+      unset 'notified[$key]'
+      continue
+    fi
+    (($(rank "$level") > $(rank "${notified[$key]:-none}"))) || continue
+    notified[$key]=$level
+
+    if [[ $level == low ]]; then
+      omarchy-notification-send -g 󰁺 -u normal "$model battery low" "Charge it soon." -t 30000
+    else
+      omarchy-notification-send -g 󰂃 -u critical "$model battery critical" "Charge it now."
+    fi
+  done
+}
+
+check
+while read -r _; do
+  check
+done < <(stdbuf -oL upower --monitor)
